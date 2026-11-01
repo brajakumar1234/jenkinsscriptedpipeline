@@ -1,14 +1,20 @@
-JENKINS
-
-User:- Raja
-Password:-Raju@123456789
-
-/root/.jenkins/secrets/initialAdminPassword
-
-688a6d8d26734b9c8c9dcf4f76b9f3c7
-688a6d8d26734b9c8c9dcf4f76b9f3c7
-688a6d8d26734b9c8c9dcf4f76b9f3c7
-
-http://13.60.68.179:8080/
-
-https://github.com/brajakumar1234/fullstack-docker-project.git
+node('built-in') {
+   stage('continuousdownload') 
+   {
+       git 'https://github.com/IntelliqDevops/maven.git'
+   }
+   stage('continuousbuild') {
+       sh 'mvn package'
+   }
+   stage('continuousDeployement') {
+       deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: 'f4fbfd69-a36e-466a-985b-3e635392c1c2', path: '', url: 'http://172.31.22.41:8080')], contextPath: 'pipeline', war: '**/*.war'
+   }
+   stage('continuoustesting') {
+       git 'https://github.com/IntelliqDevops/FunctionalTesting.git'
+       sh 'java -jar /var/lib/jenkins/workspace/scriptedpipeline1/testing.jar'
+   }
+    stage('continuous Delivery') {
+        deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: 'f4fbfd69-a36e-466a-985b-3e635392c1c2', path: '', url: 'http://172.31.25.122:8080')], contextPath: 'prod', war: '**/*.war'
+   }
+ 
+}
